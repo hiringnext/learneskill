@@ -1,0 +1,623 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load tinymce_tags %}
+{% load hitcount_tags %}
+{% load ratings %}
+{% load humanize %}
+
+
+{% block title %}
+    <title>{{ object.title }} | learneskill.com </title>
+{% endblock title %}
+
+{% block content %}
+    <head>
+        {% tinymce_preview "preview-content" %}
+    </head>
+
+    {#    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css"#}
+    {#          integrity="sha384-AysaV+vQoT3kOAXZkl02PThvDr8HYKPZhNT5h/CXfBThSRXQ6jW5DO2ekP5ViFdi" crossorigin="anonymous">#}
+
+    <body>
+
+    <div class="wrapper">
+        <section class="sidebar-page">
+            <div class="container">
+                <!-- ========================================= SIDEBAR ========================================= -->
+                <div class="col-xs-12 col-sm-3 no-margin sidebar narrow">
+                    <!-- ========================================= CATEGORY TREE ========================================= -->
+                    <div class="widget accordion-widget category-accordions">
+                        <div class="body bordered">
+                            <h3 class="border text-primary">Category Tree</h3>
+                            {% for main in main_category %}
+                                <div class="accordion">
+                                    <div class="accordion-group">
+                                        <div class="accordion-heading">
+                                            <a class="accordion-toggle active" data-toggle="collapse"
+                                               href="#{{ main.id }}">
+                                                {{ main.title }}
+                                            </a>
+                                        </div>
+                                        <div id="{{ main.id }}" class="accordion-body collapse">
+                                            <div class="accordion-inner">
+                                                {% for category in main.default_main_category.all %}
+                                                    <ul>
+                                                        <li>
+                                                            <a href="{{ category.get_absolute_url }}">{{ category.title }}
+                                                                ({{ category.course_detail_set.count }})</a>
+                                                        </li>
+                                                    </ul>
+                                                {% endfor %}
+                                            </div><!-- /.accordion-inner -->
+                                        </div>
+                                    </div><!-- /.accordion -->
+                                </div><!-- /.category-accordions -->
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <!-- ========================================= CATEGORY TREE : END ========================================= -->
+                    <!-- ========================================= Recently Updated PRODUCTS : START ========================================= -->
+                    <div class="widget">
+                        <h1 class="border">Recently Updated</h1>
+                        <ul class="product-list">
+
+                            {% for course in recently_updated %}
+                                <li class="sidebar-product-list-item">
+                                    <div class="row">
+                                        {% for img in course.courseimage_set.all %}
+                                            <div class="col-xs-4 col-sm-4 no-margin">
+                                                <a href="#" class="thumb-holder">
+                                                    <img height="73" width="73" id="img" src="{{ img.image.url }}"/>
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                        <div class="col-xs-8 col-sm-8 no-margin">
+                                            <a href="{{ course.get_absolute_url }}"><span style="font-weight: 500">{{ course.title|truncatechars:'30' }}</span></a>
+                                            <div class="price">
+                                                {% if course.discount >= 5 %}
+                                                    <div class="label-discount">{{ course.discount }}% off</div>
+                                                {% endif %}
+                                                {% if course.discount == 100 %}
+                                                    <div class="price-prev"></div>
+                                                    <div class="price-current">Free</div>
+                                                {% else %}
+                                                    {% if course.actual_price == course.sale_price %}
+                                                        <div class="price-prev"></div>
+                                                    {% else %}
+                                                        <div class="price-prev">${{ course.actual_price }}</div>
+                                                    {% endif %}
+                                                    <div class="price-current">${{ course.sale_price }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li><!-- /.sidebar-product-list-item -->
+                            {% endfor %}
+
+
+                        </ul><!-- /.product-list -->
+                    </div><!-- /.widget -->
+                    <!-- ========================================= Recently Updated PRODUCTS : END ========================================= -->
+                    <!-- ========================================= Top Discount PRODUCTS : START ========================================= -->
+                    <div class="widget">
+                        <h1 class="border">Top Discount</h1>
+                        <ul class="product-list">
+
+                            {% for course in top_discount %}
+                                <li class="sidebar-product-list-item">
+                                    <div class="row">
+                                        {% for img in course.courseimage_set.all %}
+                                            <div class="col-xs-4 col-sm-4 no-margin">
+                                                <a href="#" class="thumb-holder">
+                                                    <img height="63" width="73" id="img" src="{{ img.image.url }}"/>
+                                                </a>
+                                            </div>
+                                        {% endfor %}
+                                        <div class="col-xs-8 col-sm-8 no-margin">
+                                            <a href="{{ course.get_absolute_url }}"><span style="font-weight: 500">{{ course.title|truncatechars:'30' }}</span></a>
+                                            <div class="price">
+                                                {% if course.discount >= 5 %}
+                                                    <div class="label-discount">{{ course.discount }}% off</div>
+                                                {% endif %}
+                                                {% if course.discount == 100 %}
+                                                    <div class="price-prev"></div>
+                                                    <div class="price-current">Free</div>
+                                                {% else %}
+                                                    {% if course.actual_price == course.sale_price %}
+                                                        <div class="price-prev"></div>
+                                                    {% else %}
+                                                        <div class="price-prev">${{ course.actual_price }}</div>
+                                                    {% endif %}
+                                                    <div class="price-current">${{ course.sale_price }}</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li><!-- /.sidebar-product-list-item -->
+                            {% endfor %}
+
+
+                        </ul><!-- /.product-list -->
+                    </div><!-- /.widget -->
+                    <!-- ========================================= Top Discount PRODUCTS : END ========================================= -->
+                </div>
+                <!-- ========================================= SIDEBAR : END ========================================= -->
+
+                <!-- ========================================= CONTENT ========================================= -->
+
+                <div class="col-xs-12 col-sm-9 no-margin wide sidebar page-main-content">
+                    <div id="single-product" class="row">
+
+                        <div class="no-margin col-xs-12 col-sm-6 col-md-5 gallery-holder">
+                            <div class="product-item-holder size-big single-product-gallery">
+                                {% for img in object.courseimage_set.all %}
+                                    <div id="">
+                                        <a data-rel="prettyphoto" href="{{ object.url }}">
+                                            {% if object.discount == 0 %}
+                                            {% else %}
+                                                <div class="ribbon green"><span>{{ object.discount }}% off</span></div>
+                                            {% endif %}
+                                            <img height="400" width="420" alt="" src="{{ img.image.url }}">
+                                        </a>
+                                    </div><!-- /.single-product-slider -->
+                                {% endfor %}
+                            </div><!-- /.single-product-gallery -->
+                        </div><!-- /.gallery-holder -->
+                        <div class="no-margin col-xs-12 col-sm-7 body-holder">
+                            <div class="body">
+                                {% ratings object %}
+                                <div class="title">
+                                    <h1> {{ object.title|title }} </h1>
+                                </div>
+
+                                <div class="title"><span>Student Enrolled:</span> <span
+                                        class="text-primary bold">{{ object.student_enrolled }}</span> Total views: <i
+                                        class="fa fa-eye fa-lg text-primary"> {% get_hit_count for object %} </i></div>
+
+                                <br>
+                                <div class="social-row">
+                                    <span class="st_facebook_hcount"><a
+                                            href="http://www.facebook.com/sharer/sharer.php?u=http://www.empowerconsultant.in}"></a></span>
+                                    <span class="st_twitter_hcount"></span>
+                                    <span class="st_pinterest_hcount"></span>
+                                    <span class="st_linkedin_hcount"></span><br>
+                                </div>
+                                <div class="social-row">
+                                    <span class="st_googleplus_hcount"><a
+                                            href="https://plus.google.com/share?url=http://your-domain{{ request.get_full_path|urlencode }}"></a></span>
+                                    <span class="st_stumbleupon_hcount"></span>
+                                    <span class="st_tumblr_hcount"></span>
+                                    <span class="st_instagram_hcount"></span>
+                                </div>
+                                <br>
+                                <div class="buttons-holder">
+
+                                    <a style="color: black" href="{{ object.course_provider.get_absolute_url }}">Course
+                                        Provider: <span
+                                                class="text-primary bold">{{ object.course_provider }}</span> </a>
+                                </div>
+                                <br>
+
+                                <div class="excerpt">
+                                    <p>{{ object.sub_title }}</p>
+                                </div>
+
+                                <div class="prices">
+                                    {% if object.discount == 100 %}
+                                        <div class="price-current">Free</div>
+                                        <div class="price-prev"></div>
+                                    {% elif object.sale_price == object.actual_price %}
+                                        <div class="price-current">${{ object.sale_price }}</div>
+                                    {% else %}
+                                        <div class="price-current">${{ object.sale_price }}</div>
+                                        <div class="price-prev">${{ object.actual_price }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="qnt-holder">
+                                    <a href="{{ object.url }}" class="le-button huge" target="_blank">Take This
+                                        Course</a>
+                                </div><!-- /.qnt-holder -->
+                            </div><!-- /.body -->
+                        </div><!-- /.body-holder -->
+                    </div><!-- /.row #single-product -->
+
+                    <!-- ========================================= SINGLE PRODUCT TAB ========================================= -->
+                    <section id="single-product-tab">
+                        <div class="no-container">
+                            <div class="tab-holder">
+
+                                <ul class="nav nav-tabs simple">
+                                    <li class="active"><a href="#description" data-toggle="tab">Description</a></li>
+                                    {#                                    <li><a href="#additional-info" data-toggle="tab">Course Information</a></li>#}
+                                </ul><!-- /.nav-tabs -->
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="description">
+                                        <p id="preview-content">{{ object.description | safe | linebreaks | truncatechars:'5000' }}</p>
+                                        <div class="meta-row">
+                                            <div class="inline">
+                                                <label>categories:</label>
+                                                <span><a
+                                                        href="{{ object.default.get_absolute_url }}"><span style="color: green; font-size: 15px; font-weight: 500">{{ object.default }}</span></a></span>
+                                                <span><a href="#"></a></span>
+                                                <span><a href="#"></a></span>
+                                            </div><!-- /.inline -->
+
+                                            <span class="seperator">/</span>
+
+                                            <div class="inline">
+                                                <label>tag:</label>
+                                                {% for tag in course_detail.tags.all %}
+                                                    <span><a href="{% url 'tagged' tag.slug %}"><span
+                                                            class="tag tag-default"
+                                                            style="color: green; font-size: 15px; font-weight: 500">{{ tag }}, </span></a></span>
+                                                {% endfor %}
+
+                                            </div><!-- /.inline -->
+                                        </div><!-- /.meta-row -->
+                                    </div><!-- /.tab-pane #description -->
+                                </div><!-- /.tab-content -->
+                            </div><!-- /.tab-holder -->
+                        </div><!-- /.container -->
+                    </section><!-- /#single-product-tab -->
+                    <!-- ========================================= SINGLE PRODUCT TAB : END ========================================= -->
+                    <!-- ========================================= Related Courses ========================================= -->
+                    <section id="recently-reviewd" class="wow fadeInUp">
+                        <div class="no-container">
+                            <div class="carousel-holder hover">
+
+                                <div class="title-nav">
+                                    <h2 class="h1">Related Courses </h2>
+                                    <div class="nav-holder">
+                                        <a href="#prev" data-target="#owl-recently-viewed-2"
+                                           class="slider-prev btn-prev fa fa-angle-left"></a>
+                                        <a href="#next" data-target="#owl-recently-viewed-2"
+                                           class="slider-next btn-next fa fa-angle-right"></a>
+                                    </div>
+                                </div><!-- /.title-nav -->
+
+                                <div id="owl-recently-viewed-2" class="owl-carousel product-grid-holder">
+                                    {% for course in related %}
+                                        <div class="no-margin carousel-item product-item-holder size-medium hover">
+
+                                            <div class="product-item">
+
+                                                {% for img in course.courseimage_set.all %}
+
+                                                    <img style="padding-top: 9px;" height="130" width="200" alt=""
+                                                         src="{{ img.image.url }}"/>
+
+                                                {% endfor %}
+
+                                                <div class="body">
+                                                    <div class="title">
+                                                        {% if course.discount == 100 %}
+                                                            <div class="label-discount">Free</div>
+                                                        {% elif course.discount == 0 %}
+
+                                                        {% else %}
+                                                            <div class="label-discount">{{ course.discount }}% off</div>
+                                                        {% endif %}
+                                                        <a href="{{ course.get_absolute_url }}">{{ course.title | truncatechars:'40' }}</a>
+                                                    </div>
+
+                                                    <div class="brand">{{ course.sub_title|truncatechars:'50' }}</div>
+                                                </div>
+                                                <div class="prices">
+                                                    {% if course.discount == 100 %}
+                                                        <div class="price-current text-right">Free</div>
+                                                    {% else %}
+                                                        <div class="price-current text-right">
+                                                            ${{ course.sale_price }}</div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="hover-area">
+                                                    <div class="add-cart-button">
+                                                        <a href="{{ course.get_absolute_url }}" class="le-button">Take
+                                                            This
+                                                            Course</a>
+                                                    </div>
+                                                    <div class="wish-compare">
+                                                        <a class="text-right text-muted" href="#"><span>Enrolled:</span>
+                                                            <span class="text-primary">{{ course.student_enrolled }}+ students</span></a>
+                                                    </div>
+                                                </div>
+
+                                            </div><!-- /.product-item -->
+
+                                        </div><!-- /.product-item-holder -->
+                                    {% endfor %}
+                                    <!-- /.product-item-holder -->
+                                </div><!-- /#recently-carousel -->
+
+                            </div><!-- /.carousel-holder -->
+                        </div><!-- /.container -->
+                    </section><!-- /#recently-reviewd -->
+                    <!-- ========================================= RECENTLY VIEWED : END ========================================= -->
+                    <div id="disqus_thread"></div>
+
+                    <script>
+
+                        /**
+                         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+                         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+                        /*
+                         var disqus_config = function () {
+                         this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+                         this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+                         };
+                         */
+                        (function () { // DON'T EDIT BELOW THIS LINE
+                            var d = document, s = d.createElement('script');
+                            s.src = '//dealsndiscount.disqus.com/embed.js';
+                            s.setAttribute('data-timestamp', +new Date());
+                            (d.head || d.body).appendChild(s);
+                        })();
+                    </script>
+                    <noscript>Please enable JavaScript to view the <a
+                            href="https://disqus.com/?ref_noscript">comments
+                        powered by Disqus.</a></noscript>
+                </div><!-- /.page-main-content -->
+                <!-- ========================================= CONTENT : END ========================================= -->
+
+            </div><!-- /.container -->
+        </section><!-- /.sidebar-page -->
+
+    </div><!-- /.wrapper -->
+
+    </body>
+{% endblock %}
+
+{% block footer_content %}
+    <footer id="footer" class="color-bg">
+        <div class="container">
+            <div class="row no-margin widgets-row">
+                <div class="col-xs-12  col-sm-4 no-margin-left">
+                    <!-- ============================================================= FEATURED PRODUCTS ============================================================= -->
+                    <div class="widget">
+                        <h2>New Arrivals Books</h2>
+                        <div class="body">
+                            <ul>
+                                <li>
+                                    <div class="row">
+                                        {% for book in recently_book_footer %}
+                                            <div class="col-xs-12 col-sm-9 no-margin">
+                                                <a href="{{ book.get_absolute_url }}"><span style="font-weight: 500">{{ book.title | truncatechars:'55' }}</span></a>
+                                                <div class="price">
+                                                    <div class="price-prev">$ {{ book.actual_price }}</div>
+                                                    <div class="price-current"><span
+                                                            class="bold">$ {{ book.sale_price }}</span></div>
+                                                </div>
+                                            </div>
+
+                                            {% for img in book.bookimage_set.all %}
+                                                <div class="col-xs-12 col-sm-3 no-margin">
+                                                    <a href="#" class="thumb-holder">
+                                                        <img alt="" src="" height="60" width="75"
+                                                             data-echo="{{ img.image.url }}"/>
+                                                    </a>
+                                                </div>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                            </ul>
+                        </div><!-- /.body -->
+                    </div> <!-- /.widget -->
+                    <!-- ============================================================= FEATURED PRODUCTS : END ============================================================= -->
+                </div><!-- /.col -->
+
+                <div class="col-xs-12 col-sm-4 ">
+                    <!-- ============================================================= ON SALE PRODUCTS ============================================================= -->
+                    <div class="widget">
+                        <h2>Top Discount Books</h2>
+                        <div class="body">
+                            <ul>
+                                <li>
+                                    <div class="row">
+                                        {% for book in discount_book_footer %}
+                                            <div class="col-xs-12 col-sm-9 no-margin">
+                                                <a href="{{ book.get_absolute_url }}"><span style="font-weight: 500">{{ book.title | truncatechars:'55' }}</span></a>
+                                                <div class="price">
+
+                                                    <div class="price-prev">$ {{ book.actual_price }}</div>
+                                                    <div class="price-current"><span
+                                                            class="bold">$ {{ book.sale_price }}</span></div>
+                                                </div>
+                                            </div>
+
+                                            {% for img in book.bookimage_set.all %}
+
+                                                <div class="col-xs-12 col-sm-3 no-margin">
+                                                    <a href="#" class="thumb-holder">
+                                                        <img alt="" src="" height="60" width="75"
+                                                             data-echo="{{ img.image.url }}"/>
+                                                    </a>
+                                                </div>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                            </ul>
+                        </div><!-- /.body -->
+                    </div> <!-- /.widget -->
+                    <!-- ============================================================= ON SALE PRODUCTS : END ============================================================= -->
+                </div><!-- /.col -->
+
+                <div class="col-xs-12 col-sm-4 ">
+                    <!-- ============================================================= TOP RATED PRODUCTS ============================================================= -->
+                    <div class="widget">
+                        <h2>Featured Blog Post</h2>
+                        <div class="body">
+                            <ul>
+                                <li>
+                                    <div class="row">
+                                        {% for blog in blog_footer %}
+                                            <div class="col-xs-12 col-sm-9 no-margin">
+                                                <a href="{{ blog.get_absolute_url }}"><span style="font-weight: 500"> {{ blog.title | truncatechars:'60' }}</span></a>
+                                                <div class="price">
+                                                    <div class="price-prev"></div>
+                                                    <div class="price-current"><span
+                                                            class="bold"></span></div>
+                                                </div>
+                                            </div>
+
+                                            {% for img in blog.blogimage_set.all %}
+                                                <div class="col-xs-12 col-sm-3 no-margin">
+                                                    <a href="#" class="thumb-holder">
+                                                        <img alt="" src="" height="57" width="75"
+                                                             data-echo="{{ img.image.url }}"/>
+                                                    </a>
+                                                </div>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                </li>
+                            </ul>
+                        </div><!-- /.body -->
+                    </div><!-- /.widget -->
+                    <!-- ============================================================= TOP RATED PRODUCTS : END ============================================================= -->
+                </div><!-- /.col -->
+
+            </div><!-- /.widgets-row-->
+        </div><!-- /.container -->
+
+        <div class="sub-form-row">
+            <div class="container">
+                <div class="sub-form-row">
+                    <div class="container">
+                        <div class="col-md-10">
+                            <form role="form" action="/newsletter/dealsndiscount/subscribe/" method="POST">
+                                {% csrf_token %}
+                                <input placeholder="Subscribe to our newsletter">
+                                <button class="le-button">Subscribe</button>
+                            </form>
+                        </div>
+                    </div><!-- /.container -->
+                </div><!-- /.sub-form-row -->
+            </div><!-- /.container -->
+        </div><!-- /.sub-form-row -->
+
+        <div class="link-list-row">
+            <div class="container no-padding">
+                <div class="col-xs-12 col-md-4 ">
+                    <!-- ============================================================= CONTACT INFO ============================================================= -->
+                    <div class="contact-info">
+                        <div class="footer-logo">
+                            <div class="logo">
+                                <a href="{% url 'index' %}">
+                                    <img alt="logo" src="{% static 'assets/images/logo.png' %}" width="233"
+                                         height="54"/>
+                                </a>
+                            </div><!-- /.logo -->
+                        </div><!-- /.footer-logo -->
+
+                        <p class="regular-bold"> Feel free to contact us via email.</p>
+
+                        <i class="fa fa-envelope"></i><span class="le-color"> hello@learneskills.com</span>
+
+                        <div class="social-icons">
+                            <h3>Get in touch</h3>
+                            <ul>
+                                <li><a href="http://facebook.com/transvelo" class="fa fa-facebook"></a></li>
+                                <li><a href="#" class="fa fa-twitter"></a></li>
+                                <li><a href="#" class="fa fa-pinterest"></a></li>
+                                <li><a href="#" class="fa fa-linkedin"></a></li>
+                                <li><a href="#" class="fa fa-stumbleupon"></a></li>
+                                <li><a href="#" class="fa fa-dribbble"></a></li>
+                                <li><a href="#" class="fa fa-vk"></a></li>
+                            </ul>
+                        </div><!-- /.social-icons -->
+
+                    </div>
+                    <!-- ============================================================= CONTACT INFO : END ============================================================= -->
+                </div>
+
+                <div class="col-xs-12 col-md-8 no-margin">
+                    <!-- ============================================================= LINKS FOOTER ============================================================= -->
+                    <div class="link-widget">
+                        <div class="widget">
+                            <h3 class="text-success">Courses Tag List</h3>
+                            {% for tag in course_tags %}
+
+                                {% if forloop.counter|divisibleby:'3' %}
+                                    <a style="font-size: 13pt;"
+                                       href="{% url 'tagged' tag.slug %}"><span class="text-muted">{{ tag }},</span></a>
+
+                                {% elif tag.name == 'programming' and 'development' %}
+                                    <a style="font-size: 18pt;"
+                                       href="{% url 'tagged' tag.slug %}"> <span
+                                            class="text-muted">{{ tag }},</span></a>
+                                {% else %}
+                                    <a style="font-size: 10pt;"
+                                       href="{% url 'tagged' tag.slug %}"><span class="text-muted">{{ tag }},</span></a>
+                                {% endif %}
+
+                            {% endfor %}
+                        </div><!-- /.widget -->
+                    </div><!-- /.link-widget -->
+
+                    <div class="link-widget">
+                        <div class="widget">
+                            <h3 class="text-success">Books Tag List</h3>
+                            <div class="tagcloud">
+                                {% for tag in book_tags %}
+                                    {% if forloop.counter|divisibleby:'3' %}
+                                        <a style="font-size: 14pt;"
+                                           href="{% url 'book-tagged' tag.slug %}"><span
+                                                class="text-muted">{{ tag }},</span></a>
+
+                                    {% elif tag.name %}
+                                        <a style="font-size: 10pt;"
+                                           href="{% url 'book-tagged' tag.slug %}"> <span
+                                                class="text-muted">{{ tag }},</span></a>
+                                    {% else %}
+                                        <a style="font-size: 16pt;"
+                                           href="{% url 'book_tagged' tag.slug %}"><span
+                                                class="text-muted">{{ tag }},</span></a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div><!-- /.widget -->
+                    </div><!-- /.link-widget -->
+
+                    <div class="link-widget">
+                        <div class="widget">
+                            <h3 class="text-success">Blog Tag List</h3>
+                            <div class="tagcloud">
+
+                                {% for tag in blog_tags %}
+                                    {% if forloop.counter|divisibleby:'3' %}
+                                        <a style="font-size: 13pt;"
+                                           href="{% url 'blog_tagged' tag.slug %}"><span
+                                                class="text-muted">{{ tag }}</span></a>
+
+                                    {% elif tag.name == 'programming' %}
+                                        <a style="font-size: 18pt;"
+                                           href="{% url 'blog_tagged' tag.slug %}"><span
+                                                class="text-muted">{{ tag }},</span></a>
+                                    {% else %}
+                                        <a style="font-size: 10pt;"
+                                           href="{% url 'blog_tagged' tag.slug %}"><span
+                                                class="text-muted">{{ tag }},</span></a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div><!-- /.widget -->
+                    </div><!-- /.link-widget -->
+                    <!-- ============================================================= LINKS FOOTER : END ============================================================= -->
+                </div>
+            </div><!-- /.container -->
+        </div><!-- /.link-list-row -->
+
+        <div class="copyright-bar">
+            <div class="container">
+                <div class="col-xs-12 col-sm-6 no-margin">
+                    <div class="copyright">
+                        &copy; <a href="index.html">learnEskills</a> - all rights reserved
+                    </div><!-- /.copyright -->
+                </div>
+            </div><!-- /.container -->
+        </div><!-- /.copyright-bar -->
+
+    </footer><!-- /#footer -->
+{% endblock %}

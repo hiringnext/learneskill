@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load el_pagination_tags %}
+
+{% block title %}<title>learneskill.com | Great place to learn & upgrade your skills
+</title>{% endblock title %}
+
+{% block header %}
+    <header>
+        <div class="container no-padding">
+
+            <div class="col-xs-12 col-sm-12 col-md-3 logo-holder">
+                <!-- ============================================================= LOGO ============================================================= -->
+                <div class="logo">
+                    <a href="{% url 'index' %}">
+                        <img alt="logo" src="{% static 'assets/images/logo_new1.png' %}" width="233" height="54"/>
+                    </a>
+                </div><!-- /.logo -->
+                <!-- ============================================================= LOGO : END ============================================================= -->
+            </div><!-- /.logo-holder -->
+
+            <div class="col-xs-12 col-sm-12 col-md-6 top-search-holder no-margin">
+                <div class="contact-row">
+                    <div class="phone inline">
+                    </div>
+                    <div class="contact inline">
+                        <i class="fa fa-envelope"></i><span class="le-color"> contact@booksntutorials.com</span>
+                    </div>
+                </div><!-- /.contact-row -->
+                <!-- ============================================================= SEARCH AREA ============================================================= -->
+                <div class="search-area">
+                    <form action="/search/" method="GET" role="form">
+                        <div class="control-group">
+                            <input class="search-field" name="q" placeholder="Search for Tutorials and Books "/>
+                            <a type="submit" class="search-button"></a>
+                        </div>
+                    </form>
+                </div><!-- /.search-area -->
+
+                <!-- ============================================================= SEARCH AREA : END ============================================================= -->
+            </div><!-- /.top-search-holder -->
+        </div><!-- /.container -->
+    </header>
+
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="tab-content">
+
+            {% if query %}
+
+                <div class="container">
+                    <!-- ========= Search - Course - Start =========-->
+                    <div class="col-md-12">
+                        <h1 class="text-primary"> Search Area </h1>
+                        {% for cat_img in category.categoryimage_set.all %}
+                            <div id="grid-page-banner">
+                                <img height="227" width="899"
+                                     src="{{ cat_img.image.url }}" alt=""/>
+                                {# {% static 'assets/images/banners/web-development-banner-cheapes.jpg' %} #}
+                            </div>
+                        {% endfor %}
+                        <section id="gaming">
+                            <div class="grid-list-products">
+                                <h2 class="section-title">{{ object_list.course_title }}</h2>
+
+                                <div class="tab-content">
+                                    <div id="list-view" class="products-grid fade tab-pane in active">
+
+                                        <div class="products-list">
+                                            {% paginate page.object_list as object %}
+                                            {% for course in page.object_list %}
+
+                                                <div class="product-item product-item-holder">
+                                                    {% if course.course_course_provider %}
+                                                        <div class="ribbon red"><span>Course</span>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="ribbon red"><span>Book</span>
+                                                        </div>
+                                                    {% endif %}
+                                                    {% if course.course_discount %}
+                                                        <div class="ribbon green">
+                                                            <span>{{ course.course_discount }}% off</span>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="ribbon green">
+                                                            <span>{{ course.book_discount }}% off</span>
+                                                        </div>
+                                                    {% endif %}
+
+
+
+                                                    <div class="row">
+
+                                                        {% for img in course.object.courseimage_set.all %}
+                                                            <div class="no-margin col-xs-12 col-sm-4 image-holder">
+                                                                <div class="image">
+                                                                    <img height="170" width="250" id="img" alt=""
+                                                                         src="{{ img.image.url }} "/>
+                                                                </div>
+                                                            </div><!-- /.image-holder -->
+                                                        {% endfor %}
+
+                                                        {% for img in course.object.bookimage_set.all %}
+                                                            <div class="no-margin col-xs-12 col-sm-4 image-holder">
+                                                                <div class="image">
+                                                                    <img height="170" width="190" id="img" alt=""
+                                                                         src="{{ img.image.url }} "/>
+                                                                </div>
+                                                            </div><!-- /.image-holder -->
+                                                        {% endfor %}
+
+                                                        <div class="no-margin col-xs-12 col-sm-5 body-holder">
+                                                            <div class="body">
+                                                                <!--    <div class="label-discount green">-50% sale</div> -->
+                                                                {% if course.course_title %}
+                                                                    <div class="title">
+                                                                        <a href="{{ course.object.get_absolute_url }}">{{ course.course_title }}</a>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="title">
+                                                                        <a href="{{ course.object.get_absolute_url }}">{{ course.book_title }}</a>
+                                                                    </div>
+                                                                {% endif %}
+
+                                                                {% if course.course_sub_title %}
+                                                                    <div class="text-default">{{ course.course_sub_title | capfirst| truncatechars:'118' }}
+                                                                    </div>
+                                                                {% endif %}
+                                                                {% if course.course_title %}
+                                                                    <div class="excerpt">
+                                                                        <p class="text-default">{{ course.course_description| safe | truncatechars:'300' }}</p>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="excerpt">
+                                                                        <p class="text-default">{{ course.book_description| safe | truncatechars:'300' }}</p>
+                                                                    </div>
+                                                                {% endif %}
+                                                                <div class="title"><a class="review_add" href="#"></a>
+                                                                </div>
+                                                            </div>
+                                                        </div><!-- /.body-holder -->
+                                                        <div class="no-margin col-xs-12 col-sm-3 price-area">
+                                                            <div class="right-clmn">
+
+                                                                <div class="price-current">
+                                                                    {% if course.course_sale_price %}
+                                                                        $ {{ course.course_sale_price }}</div>
+                                                                    {% else %}
+                                                                        $ {{ course.book_sale_price }}</div>
+                                                                    {% endif %}
+
+                                                            <div class="price-prev">
+                                                                {% if course.course_actual_price %}
+                                                                    <span style="text-decoration: line-through;">$ {{ course.course_actual_price }}</span>
+                                                                {% else %}
+                                                                    <span style="text-decoration: line-through;">$ {{ course.book_actual_price }}</span>
+                                                                {% endif %}
+                                                            </div>
+                                                            {% if course.course_course_provider %}
+                                                                <div class="title ">Provider:
+                                                                    <label class="text-primary">{{ course.course_course_provider }}</label>
+                                                                </div>
+                                                            {% else %}
+                                                                <div class="title ">Author Name::
+                                                                    <label class="text-primary">{{ course.object.author_name }}</label>
+                                                                </div>
+                                                            {% endif %}
+                                                            {% if "course" in course.object.get_absolute_url %}
+                                                                <a class="le-button"
+                                                                   href="{{ course.object.get_absolute_url }}">Course</a>
+                                                            {% else %}
+                                                                <a class="le-button"
+                                                                   href="{{ course.object.get_absolute_url }}">Book</a>
+                                                            {% endif %}
+
+                                                            {% if course.course_student_enrolled %}
+                                                                <div class="title">Enrolled: <label
+                                                                        class="text-primary">{{ course.course_student_enrolled }}+
+                                                                    students</label></div>
+                                                            {% else %}
+                                                                <div class="title"></div>
+                                                            {% endif %}
+
+                                                        </div><!-- /.price-area -->
+                                                    </div><!-- /.row -->
+                                                </div><!-- /.product-item -->
+                                                </div>
+                                            {% empty %}
+
+                                                <h1 class="text-danger"> No Result Found!</h1>
+                                                <!-- /.products-list -->
+                                            {% endfor %}
+                                        {% get_pages %}
+
+                                    </div><!-- /.products-grid #list-view -->
+                                </div><!-- /.tab-content -->
+                            </div><!-- /.grid-list-products -->
+                        </section><!-- /#gaming -->
+                    </div><!-- /.col -->
+                    <!-- ========== Search - Course - End ========-->
+                    <!-- Pagination Section START -->
+                    <div class="col-md-offset-3">
+                        <ul class="pagination">
+                            {% if object.paginated %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ object.first.path }}"
+                                       aria-label="First">
+                                        <span aria-hidden="true">&lt;&lt;</span>
+                                        <span class="sr-only">First</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ object.previous.path }}"
+                                       aria-label="Previous">
+                                        <span aria-hidden="true">&lt;</span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                                {% for page in object %}
+                                    {% if page == None %}
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" aria-label="...">
+                                                <span aria-hidden="true">...</span>
+                                                <span class="sr-only">...</span>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item {% if page.is_current %} active {% endif %}">
+                                            <a class="page-link" href="{{ page.path }}"
+                                               aria-label="Page {{ page.number }}">
+                                                <span aria-hidden="true">{{ page.label|safe }}</span>
+                                                <span class="sr-only">Page {{ page.number }}</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ pages.next.path }}" aria-label="Next">
+                                        <span aria-hidden="true">&gt;</span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ pages.last.path }}" aria-label="Last">
+                                        <span aria-hidden="true">&gt;&gt;</span>
+                                        <span class="sr-only">Last</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <!-- /.pagination-holder -->
+                    <!-- ========================================= CONTENT : END ========================================= -->
+            {% else %}
+
+             <div class="jumbotron">
+             	<div class="container">
+             		<h3>Show some example queries to run, maybe query syntax, something else?</h3>
+                    <br>
+             		<p class="text-center">
+             			<a href="/search/" class="bold">Search Again</a>
+             		</p>
+             	</div>
+             </div>
+            {% endif %}
+                </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block footer_content %}
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <footer id="footer" class="color-bg">
+        <div class="copyright-bar">
+            <div class="container">
+                <div class="col-xs-12 col-sm-6 no-margin">
+                    <div class="copyright">
+                        &copy; <a href="#">learnEskills</a> - all rights reserved
+                    </div><!-- /.copyright -->
+                </div>
+            </div><!-- /.container -->
+        </div><!-- /.copyright-bar -->
+
+    </footer><!-- /#footer -->
+
+{% endblock %}
